@@ -341,6 +341,35 @@ canvas#physDemo {
 .credit-row .icon { font-size: 20px; flex-shrink: 0; }
 .credit-row .name { color: var(--white); font-weight: 700; min-width: 180px; }
 .credit-row .val  { color: #80b080; }
+
+/* ─── Mobile ─── */
+@media (max-width: 640px) {
+  .slide {
+    padding: 20px 16px 70px;
+    overflow-y: auto;
+  }
+  h2 { font-size: clamp(18px, 5vw, 28px); }
+  #slide-1 h1 { font-size: clamp(22px, 8vw, 38px); }
+  #slide-1 .tagline { font-size: 13px; }
+  .label { font-size: 9px; }
+  .lead { font-size: 13px !important; }
+  .list li { font-size: 13px; }
+  .two-col { grid-template-columns: 1fr; gap: 16px; }
+  .rules-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .flow { flex-wrap: wrap; gap: 4px; justify-content: center; }
+  .state-node { font-size: 7px; padding: 6px 10px; }
+  canvas#physDemo { max-width: 100%; height: auto; }
+  #nav { padding: 8px 12px; gap: 6px; }
+  .nav-btn { font-size: 10px; padding: 8px 10px; }
+  .play-btn { font-size: 10px; padding: 8px 14px; }
+  .sound-row { gap: 8px; }
+  .sound-name { font-size: 7px; min-width: 70px; }
+  .sound-hz { font-size: 9px; min-width: 60px; }
+  .credit-row .name { min-width: 120px; font-size: 13px; }
+  .credit-row { font-size: 13px; gap: 12px; }
+  .pills { gap: 6px; margin-top: 16px; }
+  .pill { font-size: 7px; padding: 5px 9px; }
+}
 </style>
 </head>
 <body>
