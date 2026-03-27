@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>SQUASH</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #c {
+            display: block;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+    </style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+'use strict';
+const C  = document.getElementById('c');
+const cx = C.getContext('2d');
+
+// ── Constants ──────────────────────────────────────────────────────
+const W      = 480;
+const H      = 640;
+const WALL   = 10;
+const PLAY_B = 592;          // y where ball falls off (bottom of play area)
+const PAD_Y  = 572;          // paddle center y
+const HUD_LINE_Y  = PLAY_B + 2;
+const HUD_TEXT_Y  = PLAY_B + 28;
+const BALL_R = 18;
+
+const COL = {
+    black : '#000000',
+    white : '#FFFFFF',
+    green : '#33FF33',
+    dgreen: '#1B7A1B',
+    red   : '#FF4444',
+    yellow: '#FFFF33',
+};
+
+C.width = W; C.height = H;
+
+function resize() {
+    const s = Math.min(window.innerWidth / W, window.innerHeight / H);
+    C.style.width  = (W * s) + 'px';
+    C.style.height = (H * s) + 'px';
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ── Audio ──────────────────────────────────────────────────────────
+let aCtx = null;
+function initAudio() {
+    if (!aCtx) aCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+function beep(freq, dur, type = 'square', vol = 0.22) {
+    if (!aCtx) return;
+    const o = aCtx.createOscillator(), g = aCtx.createGain();
+    o.connect(g); g.connect(aCtx.destination);
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, aCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, aCtx.currentTime + dur);
+    o.start(); o.stop(aCtx.currentTime + dur);
+}
+const sfx = {
+    wall()   { beep(520, 0.07); },
+    paddle() { beep(360, 0.10); },
+    lost() {
+        if (!aCtx) return;
+        const o = aCtx.createOscillator(), g = aCtx.createGain();
+        o.connect(g); g.connect(aCtx.destination);
+        o.type = 'square';
+        o.frequency.setValueAtTime(280, aCtx.currentTime);
+        o.frequency.linearRampToValueAtTime(70, aCtx.currentTime + 0.65);
+        g.gain.setValueAtTime(0.30, aCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, aCtx.currentTime + 0.65);
+        o.start(); o.stop(aCtx.currentTime + 0.65);
+    },
+    gameover() {
+        [330, 277, 247, 220].forEach((f, i) =>
+            setTimeout(() => beep(f, 0.22, 'square', 0.32), i * 230));
+    },
+    cd(n) { beep(n === 0 ? 660 : 400 + n * 55, 0.14); },
+};
+
+// ── Ball sprite ────────────────────────────────────────────────────
+const ballImg = new Image();
+let imgOK = false;
+ballImg.onload  = () => { imgOK = true; };
+ballImg.src = 'mujtaba.png';
+
+// ── Game state ─────────────────────────────────────────────────────
+// states: opening | countdown | playing | lost | gameover
+let state = 'opening';
+let score, hiScore, lives, pHits;
+hiScore = +(localStorage.getItem('sq_hi') || 0);
+
+let ball, pad;
+let cdStart, lastCdNum;
+let lostStart;
+let blinkT = 0, blinkOn = true;
+
+// Decorative ball for opening screen
+let dball = { x: 220, y: 280, vx: 3.5, vy: -4.2 };
+
+// Ball rotation (visual only)
+let ballAngle = 0;
+
+function initGame() {
+    score = 0; lives = 3; pHits = 0;
+    pad  = { x: W / 2, y: PAD_Y, w: 90, h: 12, spd: 8 };
+    ball = { x: W / 2, y: H / 3, vx: 0, vy: 0, spd: 5.5 };
+    ballAngle = 0;
+}
+
+function launchBall() {
+    const deg = 35 + Math.random() * 40;
+    const rad = deg * Math.PI / 180;
+    const dir = Math.random() < 0.5 ? 1 : -1;
+    ball.vx = ball.spd * Math.sin(rad) * dir;
+    ball.vy = ball.spd * Math.cos(rad);   // downward
+}
+
+function goCountdown(now) {
+    state = 'countdown';
+    cdStart = now; lastCdNum = 3;
+    ball.x = W / 2; ball.y = H / 3;
+    sfx.cd(3);
+}
+
+function startGame(now) {
+    initGame();
+    goCountdown(now);
+}
+
+// ── Input ──────────────────────────────────────────────────────────
+const keys = {};
+let mouseX = W / 2;
+
+document.addEventListener('keydown', e => {
+    const first = !keys[e.key]; keys[e.key] = true;
+    if (first) initAudio();
+    if ((e.key === ' ' || e.key === 'Enter') &&
+        (state === 'opening' || state === 'gameover')) {
+        startGame(performance.now());
+    }
+    if ([' ', 'ArrowLeft', 'ArrowRight', 'a', 'A', 'd', 'D'].includes(e.key))
+        e.preventDefault();
+});
+document.addEventListener('keyup', e => { keys[e.key] = false; });
+
+C.addEventListener('mousemove', e => {
+    const r = C.getBoundingClientRect();
+    mouseX = (e.clientX - r.left) * (W / r.width);
+});
+C.addEventListener('touchmove', e => {
+    e.preventDefault();
+    initAudio();
+    const r = C.getBoundingClientRect();
+    mouseX = (e.touches[0].clientX - r.left) * (W / r.width);
+}, { passive: false });
+C.addEventListener('touchstart', () => {
+    initAudio();
+    if (state === 'opening' || state === 'gameover') startGame(performance.now());
+}, { passive: true });
+C.addEventListener('click', () => {
+    initAudio();
+    if (state === 'opening' || state === 'gameover') startGame(performance.now());
+});
+
+// ── Helpers ────────────────────────────────────────────────────────
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+// ── Update ─────────────────────────────────────────────────────────
+function updateOpening(dt) {
+    const b = dball;
+    b.x += b.vx; b.y += b.vy;
+    if (b.x < WALL + BALL_R)     { b.x = WALL + BALL_R;     b.vx =  Math.abs(b.vx); }
+    if (b.x > W - WALL - BALL_R) { b.x = W - WALL - BALL_R; b.vx = -Math.abs(b.vx); }
+    if (b.y < WALL + BALL_R)     { b.y = WALL + BALL_R;     b.vy =  Math.abs(b.vy); }
+    if (b.y > PLAY_B - BALL_R)   { b.y = PLAY_B - BALL_R;   b.vy = -Math.abs(b.vy); }
+    blinkT += dt;
+    if (blinkT > 530) { blinkOn = !blinkOn; blinkT = 0; }
+}
+
+function updateCountdown(now) {
+    const el = now - cdStart;
+    const n  = Math.max(0, 3 - Math.floor(el / 1000));
+    if (n !== lastCdNum) { lastCdNum = n; sfx.cd(n); }
+    if (el >= 4000) { state = 'playing'; launchBall(); }
+}
+
+function updatePlaying() {
+    // Paddle
+    const left  = keys['ArrowLeft']  || keys['a'] || keys['A'];
+    const right = keys['ArrowRight'] || keys['d'] || keys['D'];
+    if (left)       { pad.x -= pad.spd; mouseX = pad.x; }
+    else if (right) { pad.x += pad.spd; mouseX = pad.x; }
+    else            pad.x += (mouseX - pad.x) * 0.2;
+    pad.x = clamp(pad.x, WALL + pad.w / 2, W - WALL - pad.w / 2);
+
+    // Ball
+    ball.x += ball.vx;
+    ball.y += ball.vy;
+    ballAngle += (ball.vx / BALL_R) * 0.7;   // spin proportional to horizontal speed
+
+    // Wall bounces
+    if (ball.x - BALL_R <= WALL) {
+        ball.x = WALL + BALL_R; ball.vx = Math.abs(ball.vx);
+        sfx.wall(); score++;
+    }
+    if (ball.x + BALL_R >= W - WALL) {
+        ball.x = W - WALL - BALL_R; ball.vx = -Math.abs(ball.vx);
+        sfx.wall(); score++;
+    }
+    if (ball.y - BALL_R <= WALL) {
+        ball.y = WALL + BALL_R; ball.vy = Math.abs(ball.vy);
+        sfx.wall(); score++;
+    }
+
+    // Paddle bounce
+    const pl = pad.x - pad.w / 2, pr = pad.x + pad.w / 2;
+    const pt = pad.y - pad.h / 2;
+    const tol = Math.abs(ball.vy) + 2;
+    if (ball.vy > 0 &&
+        ball.y + BALL_R >= pt - tol &&
+        ball.y + BALL_R <= pt + pad.h &&
+        ball.x >= pl && ball.x <= pr) {
+
+        const norm  = (ball.x - pad.x) / (pad.w / 2);
+        const angle = norm * (70 * Math.PI / 180);
+        const spd   = Math.hypot(ball.vx, ball.vy);
+        ball.vx = spd * Math.sin(angle);
+        ball.vy = -spd * Math.cos(angle);
+        ball.y  = pt - BALL_R;
+
+        sfx.paddle();
+        score += 2;
+        pHits++;
+
+        // Speed up every 5 paddle hits
+        if (pHits % 5 === 0) {
+            const newSpd = Math.min(ball.spd * 1.1, 15);
+            const ratio  = newSpd / ball.spd;
+            ball.spd = newSpd;
+            ball.vx *= ratio; ball.vy *= ratio;
+        }
+
+        if (score > hiScore) {
+            hiScore = score;
+            localStorage.setItem('sq_hi', hiScore);
+        }
+    }
+
+    // Ball out
+    if (ball.y - BALL_R > PLAY_B) {
+        lives--;
+        sfx.lost();
+        if (lives <= 0) {
+            state = 'gameover';
+            sfx.gameover();
+            if (score > hiScore) { hiScore = score; localStorage.setItem('sq_hi', hiScore); }
+        } else {
+            state = 'lost';
+            lostStart = performance.now();
+        }
+    }
+}
+
+function updateLost(now) {
+    if (now - lostStart > 1800) goCountdown(now);
+}
+
+// ── Draw helpers ───────────────────────────────────────────────────
+function drawMujtaba(x, y, r, angle) {
+    cx.save();
+    cx.translate(x, y);
+    cx.rotate(angle);
+    if (imgOK) {
+        cx.drawImage(ballImg, -r, -r, r * 2, r * 2);
+    } else {
+        // fallback: white circle with "M"
+        cx.fillStyle = COL.white;
+        cx.beginPath(); cx.arc(0, 0, r, 0, Math.PI * 2); cx.fill();
+        cx.fillStyle = COL.black;
+        cx.font = `bold ${r}px monospace`;
+        cx.textAlign = 'center';
+        cx.textBaseline = 'middle';
+        cx.fillText('M', 0, 0);
+        cx.textBaseline = 'alphabetic';
+    }
+    cx.restore();
+}
+
+function pt(s, x, y, size, color, align = 'left') {
+    cx.fillStyle = color;
+    cx.font = `${size}px "Press Start 2P", monospace`;
+    cx.textAlign = align;
+    cx.fillText(s, x, y);
+    cx.textAlign = 'left';
+}
+
+function drawWalls() {
+    cx.fillStyle = COL.green;
+    cx.fillRect(0, 0, W, WALL);                 // top
+    cx.fillRect(0, WALL, WALL, PLAY_B - WALL);  // left
+    cx.fillRect(W - WALL, WALL, WALL, PLAY_B - WALL); // right
+    // corner caps
+    cx.fillRect(0, 0, WALL, WALL);
+    cx.fillRect(W - WALL, 0, WALL, WALL);
+}
+
+function drawPaddle() {
+    const px = pad.x - pad.w / 2, py = pad.y - pad.h / 2;
+    cx.fillStyle = COL.white;
+    cx.fillRect(px, py, pad.w, pad.h);
+    // centre dot
+    cx.fillStyle = COL.black;
+    cx.fillRect(pad.x - 2, py + 4, 4, 4);
+}
+
+function drawHUD() {
+    cx.fillStyle = COL.dgreen;
+    cx.fillRect(0, HUD_LINE_Y, W, 2);
+
+    pt('SCR:' + score,    WALL + 6, HUD_TEXT_Y, 9, COL.green);
+    pt('HI:' + hiScore,   W / 2,   HUD_TEXT_Y, 9, COL.dgreen, 'center');
+
+    // Lives as small Mujtaba icons
+    for (let i = 0; i < lives; i++) {
+        drawMujtaba(W - WALL - 10 - i * 22, HUD_LINE_Y + 15, 8, 0);
+    }
+}
+
+function drawScanlines() {
+    cx.fillStyle = 'rgba(0,0,0,0.12)';
+    for (let y = 0; y < H; y += 4) cx.fillRect(0, y, W, 2);
+}
+
+// ── Screen draws ───────────────────────────────────────────────────
+function drawOpening() {
+    cx.fillStyle = COL.black; cx.fillRect(0, 0, W, H);
+    drawWalls();
+
+    // Bouncing Mujtaba demo
+    drawMujtaba(dball.x, dball.y, BALL_R, ballAngle);
+    ballAngle += 0.04;
+
+    // Background Mujtaba image behind the title
+    const titleCY = H / 2 - 70;
+    const imgSize = 160;
+    if (imgOK) {
+        cx.save();
+        cx.globalAlpha = 0.65;
+        cx.drawImage(ballImg, W / 2 - imgSize / 2, titleCY - imgSize / 2, imgSize, imgSize);
+        cx.restore();
+    }
+
+    pt('MUJTABA', W / 2, titleCY - 8,  30, COL.green, 'center');
+    pt('SQUASH',  W / 2, titleCY + 32, 30, COL.green, 'center');
+
+    pt('ONE PLAYER',  W / 2, H / 2 + 8,   9, COL.dgreen, 'center');
+
+    if (blinkOn) {
+        pt('PRESS SPACE', W / 2, H / 2 + 76,  10, COL.white, 'center');
+        pt('TO START',    W / 2, H / 2 + 98,  10, COL.white, 'center');
+    }
+}
+
+function drawCountdown(now) {
+    cx.fillStyle = COL.black; cx.fillRect(0, 0, W, H);
+    drawWalls(); drawPaddle(); drawHUD();
+
+    const el = now - cdStart;
+    let label, color;
+    if      (el < 1000) { label = '3'; color = COL.white; }
+    else if (el < 2000) { label = '2'; color = COL.white; }
+    else if (el < 3000) { label = '1'; color = COL.white; }
+    else                { label = 'GO!'; color = COL.green; }
+
+    pt(label, W / 2, H / 2 + 24, label === 'GO!' ? 36 : 56, color, 'center');
+}
+
+function drawPlaying() {
+    cx.fillStyle = COL.black; cx.fillRect(0, 0, W, H);
+    drawWalls();
+    drawHUD();
+    drawMujtaba(ball.x, ball.y, BALL_R, ballAngle);
+    drawPaddle();
+}
+
+function drawLost(now) {
+    drawPlaying();
+    const flash = Math.floor((now - lostStart) / 140) % 2 === 0;
+    if (flash) { cx.fillStyle = 'rgba(220,30,30,0.22)'; cx.fillRect(0, 0, W, PLAY_B); }
+    pt('OOPS!',         W / 2, H / 2 - 18, 18, COL.white, 'center');
+    pt('LIVES: ' + lives, W / 2, H / 2 + 18, 11, COL.red,   'center');
+}
+
+function drawGameover() {
+    cx.fillStyle = COL.black; cx.fillRect(0, 0, W, H);
+    drawWalls();
+    pt('GAME OVER',        W / 2, H / 2 - 60, 22, COL.green,  'center');
+    pt('SCORE:' + score,   W / 2, H / 2,       11, COL.white,  'center');
+    pt('BEST :' + hiScore, W / 2, H / 2 + 28,  11, COL.dgreen, 'center');
+    if (blinkOn) {
+        pt('PRESS SPACE', W / 2, H / 2 + 86,  10, COL.white, 'center');
+        pt('TO RETRY',    W / 2, H / 2 + 108, 10, COL.white, 'center');
+    }
+}
+
+// ── Main loop ──────────────────────────────────────────────────────
+let lastNow = 0;
+function loop(now) {
+    const dt = Math.min(now - lastNow, 50);
+    lastNow = now;
+
+    switch (state) {
+        case 'opening':
+            updateOpening(dt);
+            drawOpening();
+            break;
+        case 'countdown':
+            updateCountdown(now);
+            drawCountdown(now);
+            break;
+        case 'playing':
+            updatePlaying();
+            drawPlaying();
+            break;
+        case 'lost':
+            updateLost(now);
+            drawLost(now);
+            blinkT += dt; if (blinkT > 530) { blinkOn = !blinkOn; blinkT = 0; }
+            break;
+        case 'gameover':
+            blinkT += dt; if (blinkT > 530) { blinkOn = !blinkOn; blinkT = 0; }
+            drawGameover();
+            break;
+    }
+
+    drawScanlines();
+    requestAnimationFrame(loop);
+}
+
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
