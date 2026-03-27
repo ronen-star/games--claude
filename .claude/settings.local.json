@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import base64; data=open\\(''mujtaba.png'',''rb''\\).read\\(\\); print\\(base64.b64encode\\(data\\).decode\\(\\)\\)\")",
+      "Bash(node -e \"const fs=require\\(''fs''\\); const data=fs.readFileSync\\(''mujtaba.png''\\); console.log\\(data.toString\\(''base64''\\)\\);\")",
+      "Bash(node -e \":*)",
+      "Bash(gh --version)",
+      "Bash(git --version)",
+      "Bash(git config:*)",
+      "Bash(code --list-extensions)"
+    ]
+  }
+}
