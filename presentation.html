@@ -344,10 +344,19 @@ canvas#physDemo {
 
 /* ─── Mobile ─── */
 @media (max-width: 640px) {
+  #app { overflow-y: auto; height: auto; min-height: 100dvh; min-height: 100vh; display: block; }
+  #stage { overflow: visible; height: auto; position: static; }
   .slide {
-    padding: 20px 16px 70px;
-    overflow-y: auto;
+    position: relative;
+    inset: auto;
+    height: auto;
+    min-height: calc(100vh - 60px);
+    padding: 20px 16px 16px;
+    display: none;
+    flex-direction: column;
   }
+  .slide.active { display: flex; }
+  #nav { position: sticky; bottom: 0; left: 0; right: 0; width: 100%; padding: 8px 12px; gap: 6px; }
   h2 { font-size: clamp(18px, 5vw, 28px); }
   #slide-1 h1 { font-size: clamp(22px, 8vw, 38px); }
   #slide-1 .tagline { font-size: 13px; }
@@ -359,7 +368,6 @@ canvas#physDemo {
   .flow { flex-wrap: wrap; gap: 4px; justify-content: center; }
   .state-node { font-size: 7px; padding: 6px 10px; }
   canvas#physDemo { max-width: 100%; height: auto; }
-  #nav { padding: 8px 12px; gap: 6px; }
   .nav-btn { font-size: 10px; padding: 8px 10px; }
   .play-btn { font-size: 10px; padding: 8px 14px; }
   .sound-row { gap: 8px; }
