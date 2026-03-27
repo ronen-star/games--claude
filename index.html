@@ -54,7 +54,7 @@ const COL = {
 C.width = W; C.height = H;
 
 function resize() {
-    const s = Math.min(window.innerWidth / W, window.innerHeight / H);
+    const s = Math.min((window.innerWidth - 4) / W, window.innerHeight / H);
     C.style.width  = (W * s) + 'px';
     C.style.height = (H * s) + 'px';
 }
