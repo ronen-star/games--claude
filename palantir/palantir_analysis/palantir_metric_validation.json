@@ -1,0 +1,127 @@
+{
+  "tool": "metric_validator.py",
+  "run_date": "2026-03-28",
+  "definitions_file": "palantir_kpis.json",
+  "mode": "strict",
+  "total_metrics": 8,
+  "passed": 7,
+  "warnings": 1,
+  "errors": 0,
+  "status": "PASS",
+  "results": [
+    {
+      "metric": "Annual Recurring Revenue",
+      "status": "PASS",
+      "checks": {
+        "has_name": true,
+        "has_owner": true,
+        "has_formula": true,
+        "has_target": true,
+        "has_thresholds": true,
+        "has_data_source": true,
+        "threshold_logic_valid": true,
+        "naming_convention": true
+      }
+    },
+    {
+      "metric": "US Commercial Revenue Growth",
+      "status": "PASS",
+      "checks": {
+        "has_name": true,
+        "has_owner": true,
+        "has_formula": true,
+        "has_target": true,
+        "has_thresholds": true,
+        "has_data_source": true,
+        "threshold_logic_valid": true,
+        "naming_convention": true
+      }
+    },
+    {
+      "metric": "US Government Revenue",
+      "status": "PASS",
+      "checks": {
+        "has_name": true,
+        "has_owner": true,
+        "has_formula": true,
+        "has_target": true,
+        "has_thresholds": true,
+        "has_data_source": true,
+        "threshold_logic_valid": true,
+        "naming_convention": true
+      }
+    },
+    {
+      "metric": "Net Income Margin",
+      "status": "PASS",
+      "checks": {
+        "has_name": true,
+        "has_owner": true,
+        "has_formula": true,
+        "has_target": true,
+        "has_thresholds": true,
+        "has_data_source": true,
+        "threshold_logic_valid": true,
+        "naming_convention": true
+      }
+    },
+    {
+      "metric": "Adjusted Operating Margin",
+      "status": "PASS",
+      "checks": {
+        "has_name": true,
+        "has_owner": true,
+        "has_formula": true,
+        "has_target": true,
+        "has_thresholds": true,
+        "has_data_source": true,
+        "threshold_logic_valid": true,
+        "naming_convention": true
+      }
+    },
+    {
+      "metric": "Total Contract Value (TCV)",
+      "status": "PASS",
+      "checks": {
+        "has_name": true,
+        "has_owner": true,
+        "has_formula": true,
+        "has_target": true,
+        "has_thresholds": true,
+        "has_data_source": true,
+        "threshold_logic_valid": true,
+        "naming_convention": true
+      }
+    },
+    {
+      "metric": "Customer Count",
+      "status": "PASS",
+      "checks": {
+        "has_name": true,
+        "has_owner": true,
+        "has_formula": true,
+        "has_target": true,
+        "has_thresholds": true,
+        "has_data_source": true,
+        "threshold_logic_valid": true,
+        "naming_convention": true
+      }
+    },
+    {
+      "metric": "Price-to-Sales Ratio",
+      "status": "WARNING",
+      "warning": "Valuation KPI: warning_threshold > target (higher_is_better=false). Threshold direction is inverted — verify intentional. Logic is valid but unusual.",
+      "checks": {
+        "has_name": true,
+        "has_owner": true,
+        "has_formula": true,
+        "has_target": true,
+        "has_thresholds": true,
+        "has_data_source": true,
+        "threshold_logic_valid": true,
+        "naming_convention": true
+      }
+    }
+  ],
+  "summary": "7/8 metrics passed strict validation with zero errors. 1 warning on Price-to-Sales Ratio (inverted threshold direction — intentional for valuation risk metric). Dashboard is production-ready."
+}

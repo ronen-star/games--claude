@@ -1,0 +1,171 @@
+{
+  "company": "Palantir Technologies Inc. (PLTR)",
+  "analysis_date": "2026-03-28",
+  "currency": "USD",
+  "kpis": [
+    {
+      "name": "Annual Recurring Revenue",
+      "owner": "Finance / IR",
+      "purpose": "מדד מרכזי לצמיחת ההכנסות השנתיות",
+      "formula": "SUM(quarterly_revenue) * 4 OR annual_reported_revenue",
+      "aggregation": "sum",
+      "data_source": "palantir_financials.csv",
+      "granularity": "annual",
+      "unit": "USD_billions",
+      "target": 5.0,
+      "warning_threshold": 4.5,
+      "critical_threshold": 4.0,
+      "actual_2025": 4.475,
+      "growth_yoy_pct": 56.18,
+      "dimensions": ["segment", "region", "customer_type"],
+      "caveats": [
+        "Revenue includes US Government, International Government, US Commercial, International Commercial",
+        "FY2025 actual: $4.475B",
+        "FY2026 guidance: ~$7.2B (61% growth)"
+      ]
+    },
+    {
+      "name": "US Commercial Revenue Growth",
+      "owner": "Commercial Sales",
+      "purpose": "AIP adoption tracker - fastest growing segment",
+      "formula": "(current_period_us_comm_rev - prior_period_us_comm_rev) / prior_period_us_comm_rev * 100",
+      "aggregation": "percentage",
+      "data_source": "palantir_financials.csv",
+      "granularity": "quarterly",
+      "unit": "percent_yoy",
+      "target": 100.0,
+      "warning_threshold": 80.0,
+      "critical_threshold": 60.0,
+      "actual_q4_2025": 137.0,
+      "dimensions": ["quarter", "customer_size", "vertical"],
+      "caveats": [
+        "Q4 2025: +137% YoY - record growth driven by AIP",
+        "Q3 2025: +121% YoY",
+        "US Comm revenue Q4 2025: $507M"
+      ]
+    },
+    {
+      "name": "US Government Revenue",
+      "owner": "Government Sales",
+      "purpose": "מעקב אחר פעילות ממשלת ארה\"ב - הבסיס ההיסטורי",
+      "formula": "SUM(revenue) WHERE segment = 'US_Government'",
+      "aggregation": "sum",
+      "data_source": "palantir_financials.csv",
+      "granularity": "quarterly",
+      "unit": "USD_millions",
+      "target": 600.0,
+      "warning_threshold": 540.0,
+      "critical_threshold": 480.0,
+      "actual_fy2025": 1320.0,
+      "growth_yoy_pct": 66.0,
+      "dimensions": ["agency", "contract_type", "quarter"],
+      "caveats": [
+        "FY2025 US Gov revenue: ~$1.32B (+66% YoY)",
+        "Q4 2025: $570M US Gov revenue",
+        "DoD and intelligence agencies primary customers"
+      ]
+    },
+    {
+      "name": "Net Income Margin",
+      "owner": "Finance",
+      "purpose": "רווחיות חשבונאית - הפכה חיובית ב-2023",
+      "formula": "net_income / total_revenue * 100",
+      "aggregation": "percentage",
+      "data_source": "palantir_financials.csv",
+      "granularity": "annual",
+      "unit": "percent",
+      "target": 15.0,
+      "warning_threshold": 10.0,
+      "critical_threshold": 5.0,
+      "actual_fy2025": 13.6,
+      "dimensions": ["segment", "quarter"],
+      "caveats": [
+        "FY2025 net income: ~$608M on $4.475B revenue",
+        "EPS: $0.24 (diluted)",
+        "Operating margins expanding significantly"
+      ]
+    },
+    {
+      "name": "Adjusted Operating Margin",
+      "owner": "Finance",
+      "purpose": "שולי הפעלה מתואמים - מדד מבצעי מרכזי",
+      "formula": "adjusted_operating_income / revenue * 100",
+      "aggregation": "percentage",
+      "data_source": "palantir_financials.csv",
+      "granularity": "quarterly",
+      "unit": "percent",
+      "target": 40.0,
+      "warning_threshold": 35.0,
+      "critical_threshold": 28.0,
+      "actual_fy2025": 38.0,
+      "dimensions": ["quarter", "segment"],
+      "caveats": [
+        "Adjusted (non-GAAP) operating margin ~38% in FY2025",
+        "Excludes stock-based compensation",
+        "Target 45%+ long-term"
+      ]
+    },
+    {
+      "name": "Total Contract Value (TCV)",
+      "owner": "Sales / BD",
+      "purpose": "מדד צמיחה עסקית - ערך חוזים חתומים",
+      "formula": "SUM(new_contract_value) in period",
+      "aggregation": "sum",
+      "data_source": "palantir_financials.csv",
+      "granularity": "quarterly",
+      "unit": "USD_millions",
+      "target": 800.0,
+      "warning_threshold": 650.0,
+      "critical_threshold": 500.0,
+      "actual_ttm": 2760.0,
+      "growth_yoy_pct": 151.0,
+      "dimensions": ["segment", "region", "contract_size"],
+      "caveats": [
+        "TTM TCV: $2.76B (+151% YoY)",
+        "US Commercial TCV: $1.31B (+342% YoY) - record",
+        "TCV leads revenue by 1-4 quarters"
+      ]
+    },
+    {
+      "name": "Customer Count",
+      "owner": "Sales",
+      "purpose": "מעקב אחר הרחבת בסיס הלקוחות",
+      "formula": "COUNT(DISTINCT active_customers)",
+      "aggregation": "count",
+      "data_source": "palantir_financials.csv",
+      "granularity": "quarterly",
+      "unit": "count",
+      "target": 600,
+      "warning_threshold": 500,
+      "critical_threshold": 400,
+      "actual_q4_2025": 711,
+      "dimensions": ["segment", "region", "industry"],
+      "caveats": [
+        "Q4 2025: 711 total customers",
+        "US Commercial customers grew significantly via AIP bootcamps",
+        "Enterprise focus - fewer but larger deals"
+      ]
+    },
+    {
+      "name": "Price-to-Sales Ratio",
+      "owner": "Investor Relations",
+      "purpose": "הערכת שווי יחסית לעמיתים",
+      "formula": "market_cap / trailing_twelve_months_revenue",
+      "aggregation": "ratio",
+      "data_source": "palantir_market.csv",
+      "granularity": "monthly",
+      "unit": "multiple",
+      "target": 50.0,
+      "warning_threshold": 80.0,
+      "critical_threshold": 120.0,
+      "actual_march_2026": 78.0,
+      "dimensions": ["date", "peer_comparison"],
+      "caveats": [
+        "P/S ~78x as of Mar 2026 (vs Snowflake ~17x, C3.ai ~9x)",
+        "P/E ~233x TTM",
+        "Premium valuation reflects AI growth expectations",
+        "Market cap ~$340-370B range in Mar 2026"
+      ]
+    }
+  ]
+}

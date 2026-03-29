@@ -1,0 +1,208 @@
+{
+  "dashboard_title": "Palantir Technologies (PLTR) — Executive BI Dashboard",
+  "generated": "2026-03-28",
+  "layout": "3-column",
+  "refresh_cadence": "Quarterly (aligned to earnings)",
+  "target_audience": "Investment analysts, executives, strategic planners",
+  "pages": [
+    {
+      "page": 1,
+      "title": "Executive Summary",
+      "layout": "summary-cards-top | charts-middle | table-bottom",
+      "widgets": [
+        {
+          "position": "top-left",
+          "type": "KPI Card",
+          "title": "FY2025 Revenue",
+          "value": "$4.475B",
+          "delta": "+56% YoY",
+          "rag": "YELLOW",
+          "color": "#FFC107",
+          "note": "vs target $5B"
+        },
+        {
+          "position": "top-center",
+          "type": "KPI Card",
+          "title": "US Comm Growth Q4",
+          "value": "+137% YoY",
+          "delta": "vs +121% Q3",
+          "rag": "GREEN",
+          "color": "#28A745",
+          "note": "AIP-driven record"
+        },
+        {
+          "position": "top-right",
+          "type": "KPI Card",
+          "title": "Market Cap",
+          "value": "~$350B",
+          "delta": "P/S: 78x",
+          "rag": "RED",
+          "color": "#DC3545",
+          "note": "Premium valuation risk"
+        },
+        {
+          "position": "mid-left",
+          "type": "KPI Card",
+          "title": "Adj. Op. Margin",
+          "value": "38%",
+          "delta": "+9pp YoY",
+          "rag": "GREEN",
+          "color": "#28A745",
+          "note": "Rule of 40 = 94"
+        },
+        {
+          "position": "mid-center",
+          "type": "KPI Card",
+          "title": "TCV (TTM)",
+          "value": "$2.76B",
+          "delta": "+151% YoY",
+          "rag": "GREEN",
+          "color": "#28A745",
+          "note": "US Comm TCV +342%"
+        },
+        {
+          "position": "mid-right",
+          "type": "KPI Card",
+          "title": "Customer Count",
+          "value": "711",
+          "delta": "+111 vs target",
+          "rag": "GREEN",
+          "color": "#28A745",
+          "note": "AIP bootcamp driven"
+        },
+        {
+          "position": "bottom-left",
+          "type": "Line Chart",
+          "title": "Revenue Trend 2019-2026E",
+          "x_axis": "year",
+          "y_axis": "revenue_total_usd_m",
+          "series": ["revenue_total_usd_m", "revenue_us_gov_usd_m", "revenue_us_comm_usd_m"],
+          "data_source": "palantir_financials.csv",
+          "annotation": "AIP launch 2023 → inflection point"
+        },
+        {
+          "position": "bottom-center",
+          "type": "Donut Chart",
+          "title": "FY2025 Revenue Mix",
+          "segments": [
+            {"label": "US Government", "value": 1372, "pct": "30.7%", "color": "#003087"},
+            {"label": "US Commercial", "value": 1466, "pct": "32.8%", "color": "#0066CC"},
+            {"label": "Intl Government", "value": 470, "pct": "10.5%", "color": "#6699CC"},
+            {"label": "Intl Commercial", "value": 767, "pct": "17.1%", "color": "#99BBDD"}
+          ]
+        },
+        {
+          "position": "bottom-right",
+          "type": "Bar Chart",
+          "title": "Quarterly Revenue Growth % YoY",
+          "x_axis": "quarter",
+          "y_axis": "revenue_growth_yoy_pct",
+          "data_source": "palantir_financials.csv",
+          "filter": "period_type = 'Quarterly'"
+        }
+      ]
+    },
+    {
+      "page": 2,
+      "title": "Competitor Analysis",
+      "layout": "2-column",
+      "widgets": [
+        {
+          "position": "top-full",
+          "type": "Bullet Chart / Comparison Table",
+          "title": "Competitor Matrix — Revenue vs Growth vs Profitability",
+          "columns": ["company", "revenue_fy2025_usd_m", "revenue_growth_yoy_pct", "market_cap_usd_b", "ps_ratio", "operating_margin_pct", "profitable"],
+          "data_source": "palantir_competitors.csv",
+          "highlight_row": "Palantir Technologies"
+        },
+        {
+          "position": "mid-left",
+          "type": "Scatter Chart",
+          "title": "Growth Rate vs Operating Margin (Rule of 40)",
+          "x_axis": "revenue_growth_yoy_pct",
+          "y_axis": "operating_margin_pct",
+          "bubble_size": "market_cap_usd_b",
+          "label": "company",
+          "data_source": "palantir_competitors.csv",
+          "reference_line": "Rule of 40 (x+y=40)"
+        },
+        {
+          "position": "mid-right",
+          "type": "Bar Chart (horizontal)",
+          "title": "Price-to-Sales Ratio Comparison",
+          "x_axis": "ps_ratio",
+          "y_axis": "company",
+          "data_source": "palantir_competitors.csv",
+          "highlight": "Palantir",
+          "sort": "descending"
+        },
+        {
+          "position": "bottom-full",
+          "type": "Heatmap / RAG Matrix",
+          "title": "Strategic Positioning Map",
+          "dimensions": ["AI Capability", "Gov Access", "Commercial Scale", "Profitability", "Valuation Risk"],
+          "companies": ["Palantir", "Snowflake", "Databricks", "C3.ai", "IBM", "Microsoft", "ServiceNow"],
+          "note": "Palantir leads in AI Capability + Gov Access; high on Valuation Risk"
+        }
+      ]
+    },
+    {
+      "page": 3,
+      "title": "Financial Deep Dive",
+      "layout": "3-column",
+      "widgets": [
+        {
+          "position": "top-left",
+          "type": "Area Chart",
+          "title": "Margin Expansion Timeline",
+          "series": ["gross_margin_pct", "adjusted_operating_margin_pct", "net_margin_pct"],
+          "x_axis": "period",
+          "data_source": "palantir_financials.csv"
+        },
+        {
+          "position": "top-center",
+          "type": "Bar + Line Combo",
+          "title": "Revenue vs Net Income",
+          "bar": "revenue_total_usd_m",
+          "line": "net_income_usd_m",
+          "x_axis": "period",
+          "data_source": "palantir_financials.csv"
+        },
+        {
+          "position": "top-right",
+          "type": "KPI Card Stack",
+          "title": "FY2026 Guidance",
+          "cards": [
+            {"metric": "FY2026 Revenue Target", "value": "$7.2B", "note": "+61% YoY"},
+            {"metric": "US Comm Revenue", "value": "+115% YoY", "note": "AIP driven"},
+            {"metric": "Adj Op Margin Target", "value": "~40%", "note": "expanding"},
+            {"metric": "EPS Consensus", "value": "$0.38", "note": "+58% YoY"}
+          ]
+        },
+        {
+          "position": "bottom-full",
+          "type": "Detail Table",
+          "title": "Quarterly Financial Summary",
+          "columns": ["period", "revenue_total_usd_m", "revenue_growth_yoy_pct", "us_comm_growth_yoy_pct", "adjusted_operating_margin_pct", "net_income_usd_m", "customer_count"],
+          "data_source": "palantir_financials.csv",
+          "filter": "period_type IN ('Quarterly','Annual')"
+        }
+      ]
+    }
+  ],
+  "filters_global": ["period", "segment", "region"],
+  "color_palette": {
+    "primary": "#003087",
+    "secondary": "#0066CC",
+    "accent": "#00A8E8",
+    "positive": "#28A745",
+    "warning": "#FFC107",
+    "negative": "#DC3545",
+    "neutral": "#6C757D",
+    "background": "#0A0A0A",
+    "text": "#FFFFFF"
+  },
+  "rag_thresholds_applied": true,
+  "estimated_load_time_seconds": 2.5,
+  "validation_status": "PASS"
+}

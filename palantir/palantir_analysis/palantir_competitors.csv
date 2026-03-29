@@ -1,0 +1,11 @@
+company,ticker,focus_area,revenue_fy2025_usd_m,revenue_growth_yoy_pct,market_cap_usd_b,ps_ratio,pe_ratio,gross_margin_pct,operating_margin_pct,profitable,key_product,go_to_market,primary_customer,ai_offering,valuation_status,notes
+Palantir Technologies,PLTR,AI/Data Platform Gov+Comm,4475,56,350,78,233,80,38,Yes,AIP / Foundry / Gotham,Direct + AIP Bootcamps,Gov & Enterprise,AIP (LLM Platform),Premium,Rule of 40: 94 - best in class
+Snowflake,SNOW,Cloud Data Warehouse,3840,29,67,17,Negative,67,-27,No,Data Cloud,Cloud Marketplace,Enterprise,Arctic LLM / Cortex AI,Moderate,Heavy SBC drag on profitability
+Databricks,DBRK (private),Data Lakehouse + AI,3700,50,100 (private val),27,N/A,~70,~-5,Near-breakeven,Lakehouse / MLflow,PLG + Enterprise Sales,Data Engineering teams,DBRX / MosaicML,High (private),Fastest-growing; IPO expected
+C3.ai,AI,Enterprise AI Apps,389,25,3.5,9,Negative,55,-30,No,Enterprise AI Suite,Direct Sales,Large Enterprise,Pre-built AI Apps,Low,Struggling to scale; growth decelerating
+IBM,IBM,Enterprise IT + AI,74800,2,200,2.7,22,55,15,Yes,WatsonX.ai,Global SI + Direct,Fortune 500,WatsonX,Low-Moderate,Massive revenue but slow AI growth; won $48M DoD contract 2025
+Microsoft (Azure AI),MSFT,Cloud + AI Platform,245000,13,2800,11,35,70,42,Yes,Azure OpenAI / Fabric,Cloud + Partner,All segments,Azure OpenAI Service,Fair,Embedded across enterprise; indirect Palantir competitor
+ServiceNow,NOW,IT Workflows + AI,11500,20,220,19,65,79,25,Yes,Now Platform AI,Direct Enterprise,IT/HR Departments,Now Assist (AI),Moderate,Strong defense/gov push; P/E 65 vs Palantir 233
+Veeva Systems,VEEV,Life Sciences Data,2700,16,40,15,40,75,32,Yes,Vault Platform,Vertical SaaS,Pharma/Biotech,Vault AI,Moderate,Narrow vertical focus; high retention
+Scale AI,SCLE (private),AI Data Labeling,~1000,~100,14 (private val),14,N/A,~60,N/A,Unknown,Data Engine,Direct + API,AI Labs & Enterprise,Data Labeling + RLHF,High (private),Critical AI infrastructure; DoD contracts
+Anduril Industries,ANDURIL (private),Defense AI,~1000,~100,28 (private val),28,N/A,N/A,N/A,Unknown,Lattice OS,Gov Direct,US DoD / Allies,Autonomous Weapons AI,High (private),Direct gov/defense competitor; fast-growing

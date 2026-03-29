@@ -1,0 +1,21 @@
+{
+  "name": "palantir-video",
+  "version": "1.0.0",
+  "description": "Palantir FY2025 investor presentation — rendered with Remotion",
+  "scripts": {
+    "start": "remotion preview",
+    "render": "remotion render PalantirPresentation out/palantir.mp4 --codec h264",
+    "render:gif": "remotion render PalantirPresentation out/palantir.gif --codec gif"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "remotion": "^4.0.0"
+  },
+  "devDependencies": {
+    "@remotion/cli": "^4.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.0.0"
+  }
+}

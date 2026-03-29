@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "skills": {
+    "business-intelligence": {
+      "source": "borghei/claude-skills",
+      "sourceType": "github",
+      "computedHash": "5d47d694cd0009be8133e2f1c1d78acef230c75ec706f708681f4f3375b69571"
+    },
+    "excalidraw-diagram": {
+      "source": "axtonliu/axton-obsidian-visual-skills",
+      "sourceType": "github",
+      "computedHash": "030c01884bc5b1342d0b90a1a09b63181f88d8de333af719981980a2e3d9ca67"
+    },
+    "remotion-best-practices": {
+      "source": "remotion-dev/skills",
+      "sourceType": "github",
+      "computedHash": "6f22ccc0dd7103de270a465b30e44b001bcee4751e43197bba60680e69928635"
+    }
+  }
+}

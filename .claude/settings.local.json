@@ -7,7 +7,15 @@
       "Bash(gh --version)",
       "Bash(git --version)",
       "Bash(git config:*)",
-      "Bash(code --list-extensions)"
+      "Bash(code --list-extensions)",
+      "Bash(find C:/Users/ronen/AppData/Roaming/Code/logs -name *.log -newer 'C:/Users/ronen/games- claude/index.html')",
+      "Bash(find C:/Users/ronen/AppData/Roaming/Code/logs -name *git*)",
+      "Bash(python \"../.claude/skills/business-intelligence/scripts/kpi_tracker.py\" --definitions palantir_kpis.json --data palantir_financials.csv)",
+      "Bash(py --version)",
+      "Bash(python3.11 --version)",
+      "Bash(ls \"C:/Python\"*)",
+      "Bash(where python:*)",
+      "Bash(\"C:/Users/ronen/AppData/Local/Microsoft/WindowsApps/python.exe\" --version)"
     ]
   }
 }

@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PLTR // INTELLIGENCE OPS DASHBOARD</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:     #050912;
+    --bg1:    #080d1a;
+    --bg2:    #0c1220;
+    --bg3:    #111827;
+    --border: rgba(0,168,255,0.13);
+    --border-bright: rgba(0,168,255,0.38);
+    --blue:   #00A8FF;
+    --cyan:   #00D4FF;
+    --amber:  #FF8C00;
+    --green:  #39FF14;
+    --red:    #FF2E4C;
+    --white:  #E8F4FF;
+    --muted:  #4A6080;
+    --text:   #96B4CC;
+    --mono:   'IBM Plex Mono', monospace;
+    --sans:   'IBM Plex Sans', sans-serif;
+    --disp:   'Orbitron', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* grid bg */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,168,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,168,255,0.025) 1px, transparent 1px);
+    background-size: 44px 44px;
+    pointer-events: none; z-index: 0;
+  }
+
+  /* scanlines */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 2px,
+      rgba(0,0,0,0.025) 2px, rgba(0,0,0,0.025) 4px
+    );
+    pointer-events: none; z-index: 9999;
+  }
+
+  /* ── HEADER ── */
+  header {
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(0,168,255,0.04) 0%, transparent 100%);
+    padding: 0 28px;
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(14px);
+  }
+  .header-inner {
+    max-width: 1440px; margin: 0 auto;
+    display: flex; align-items: center;
+    justify-content: space-between; height: 54px;
+  }
+  .header-left { display: flex; align-items: center; gap: 18px; }
+
+  .ticker {
+    font-family: var(--disp);
+    font-size: 21px; font-weight: 900;
+    color: var(--blue); letter-spacing: 0.12em;
+    text-shadow: 0 0 24px rgba(0,168,255,0.45);
+  }
+  .classif {
+    font-family: var(--mono);
+    font-size: 8.5px; letter-spacing: 0.32em;
+    color: var(--amber);
+    border: 1px solid rgba(255,140,0,0.45);
+    padding: 3px 9px;
+    text-transform: uppercase;
+  }
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 10.5px; color: var(--muted);
+    display: flex; align-items: center; gap: 22px;
+  }
+  .status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green); display: inline-block;
+    margin-right: 6px; animation: blink 2s infinite;
+  }
+  @keyframes blink {
+    0%,100% { opacity:1; box-shadow: 0 0 7px var(--green); }
+    50%      { opacity:0.35; box-shadow: none; }
+  }
+  #clock { font-family: var(--mono); font-size: 11px; color: var(--blue); letter-spacing: 0.06em; }
+
+  /* ── LAYOUT ── */
+  .wrap { max-width: 1440px; margin: 0 auto; padding: 0 28px 72px; position: relative; z-index: 1; }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 52px 0 36px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 44px;
+  }
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 9px; letter-spacing: 0.42em;
+    color: var(--muted); text-transform: uppercase; margin-bottom: 14px;
+  }
+  .hero-name {
+    font-family: var(--disp);
+    font-size: clamp(30px, 5vw, 58px);
+    font-weight: 900; letter-spacing: 0.06em;
+    color: var(--white); line-height: 1;
+  }
+  .hero-name .hl { color: var(--blue); text-shadow: 0 0 36px rgba(0,168,255,0.55); }
+  .hero-tagline {
+    font-family: var(--disp);
+    font-size: clamp(11px, 1.5vw, 18px); font-weight: 400;
+    color: var(--muted); letter-spacing: 0.2em; margin-top: 6px;
+  }
+  .hero-byline {
+    font-family: var(--mono);
+    font-size: 11px; color: var(--muted); margin-top: 18px;
+    letter-spacing: 0.1em;
+    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  }
+  .hero-byline span { display: flex; align-items: center; gap: 6px; }
+  .hero-byline i {
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--border-bright); display: inline-block;
+  }
+
+  /* ── SECTION HEAD ── */
+  .sec {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 18px; margin-top: 52px;
+  }
+  .sec-num {
+    font-family: var(--mono); font-size: 9px;
+    color: var(--blue); letter-spacing: 0.3em; opacity: 0.65;
+  }
+  .sec-title {
+    font-family: var(--disp); font-size: 11px; font-weight: 700;
+    color: var(--white); letter-spacing: 0.28em; text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .sec-line {
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--border-bright) 0%, transparent 100%);
+  }
+
+  /* ── KPI GRID ── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+  @media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(3,1fr); } }
+  @media (max-width: 640px)  { .kpi-grid { grid-template-columns: repeat(2,1fr); } }
+
+  .kpi {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 20px 16px 18px;
+    position: relative; overflow: hidden;
+    transition: border-color 0.18s, box-shadow 0.18s;
+    opacity: 0; transform: translateY(10px);
+    animation: fadeUp 0.5s ease forwards;
+  }
+  .kpi:hover { border-color: var(--border-bright); box-shadow: 0 0 24px rgba(0,168,255,0.07); }
+  .kpi::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+  }
+  .kpi.c-blue::before  { background: var(--blue); }
+  .kpi.c-amber::before { background: var(--amber); }
+  .kpi.c-green::before { background: var(--green); }
+  .kpi.c-cyan::before  { background: var(--cyan); }
+  .kpi.c-white::before { background: rgba(255,255,255,0.25); }
+
+  /* corner bracket */
+  .kpi::after {
+    content: ''; position: absolute;
+    bottom: 8px; right: 8px;
+    width: 12px; height: 12px;
+    border-bottom: 1px solid var(--border-bright);
+    border-right: 1px solid var(--border-bright);
+  }
+
+  .kpi-label {
+    font-family: var(--mono); font-size: 8.5px;
+    letter-spacing: 0.24em; color: var(--muted);
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .kpi-val {
+    font-family: var(--disp);
+    font-size: clamp(20px, 2.2vw, 30px);
+    font-weight: 700; letter-spacing: 0.02em; line-height: 1;
+    margin-bottom: 5px;
+  }
+  .kpi.c-blue  .kpi-val { color: var(--blue);  text-shadow: 0 0 20px rgba(0,168,255,0.4); }
+  .kpi.c-amber .kpi-val { color: var(--amber); text-shadow: 0 0 20px rgba(255,140,0,0.4); }
+  .kpi.c-green .kpi-val { color: var(--green); text-shadow: 0 0 20px rgba(57,255,20,0.4); }
+  .kpi.c-cyan  .kpi-val { color: var(--cyan);  text-shadow: 0 0 20px rgba(0,212,255,0.4); }
+  .kpi.c-white .kpi-val { color: var(--white); }
+  .kpi-sub { font-family: var(--mono); font-size: 9.5px; color: var(--muted); margin-bottom: 8px; }
+  .badge {
+    display: inline-block; font-family: var(--mono);
+    font-size: 8.5px; padding: 2px 7px; letter-spacing: 0.1em;
+    border: 1px solid; border-radius: 0;
+  }
+  .badge-green { background: rgba(57,255,20,0.08);  border-color: rgba(57,255,20,0.3);  color: var(--green); }
+  .badge-amber { background: rgba(255,140,0,0.08);  border-color: rgba(255,140,0,0.3);  color: var(--amber); }
+  .badge-cyan  { background: rgba(0,212,255,0.08);  border-color: rgba(0,212,255,0.3);  color: var(--cyan);  }
+  .badge-dim   { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.15); color: var(--text); }
+
+  @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
+  .kpi:nth-child(1){animation-delay:.10s} .kpi:nth-child(2){animation-delay:.18s}
+  .kpi:nth-child(3){animation-delay:.26s} .kpi:nth-child(4){animation-delay:.34s}
+  .kpi:nth-child(5){animation-delay:.42s}
+
+  /* ── CHART CARDS ── */
+  .col2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 900px) { .col2 { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--bg2); border: 1px solid var(--border);
+    padding: 22px 22px 18px; position: relative;
+    opacity: 0; animation: fadeUp 0.6s ease forwards;
+  }
+  .card-full {
+    background: var(--bg2); border: 1px solid var(--border);
+    padding: 22px 22px 18px;
+    opacity: 0; animation: fadeUp 0.6s ease forwards;
+  }
+  .card-title {
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: 0.26em; color: var(--muted);
+    text-transform: uppercase; margin-bottom: 3px;
+  }
+  .card-sub {
+    font-family: var(--sans); font-size: 11.5px;
+    color: var(--text); margin-bottom: 18px; opacity: 0.75;
+  }
+
+  /* ── COMPETITOR TABLE ── */
+  .ctable { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 11.5px; }
+  .ctable th {
+    text-align: left; padding: 9px 14px;
+    font-size: 8.5px; letter-spacing: 0.22em;
+    color: var(--muted); border-bottom: 1px solid var(--border);
+    text-transform: uppercase; white-space: nowrap;
+  }
+  .ctable td {
+    padding: 10px 14px; border-bottom: 1px solid rgba(0,168,255,0.055);
+    color: var(--text); vertical-align: middle;
+  }
+  .ctable tr:hover td { background: rgba(0,168,255,0.025); }
+  .ctable tr.pltr-row td { color: var(--white); background: rgba(255,140,0,0.04); }
+  .ctable tr.pltr-row:hover td { background: rgba(255,140,0,0.07); }
+
+  .bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .bar-track { width: 80px; height: 3px; background: var(--bg3); flex-shrink: 0; }
+  .bar-fill  { height: 100%; background: var(--blue); transition: width 1s ease; }
+  .pltr-row .bar-fill { background: var(--amber); }
+
+  .tag-target {
+    display: inline-block; font-size: 7.5px; padding: 1px 6px;
+    background: rgba(255,140,0,0.12); border: 1px solid rgba(255,140,0,0.35);
+    color: var(--amber); letter-spacing: 0.1em; margin-left: 6px;
+    vertical-align: middle;
+  }
+  .yes  { color: var(--green); font-size: 10px; }
+  .no   { color: var(--red);   font-size: 10px; }
+  .near { color: var(--amber); font-size: 10px; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 22px 28px; margin-top: 64px;
+    max-width: 1440px; margin-left: auto; margin-right: auto;
+    font-family: var(--mono); font-size: 9.5px; color: var(--muted);
+    letter-spacing: 0.1em;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 8px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="ticker">PLTR</div>
+      <div class="classif">UNCLASSIFIED // INVESTOR BRIEF</div>
+    </div>
+    <div class="header-meta">
+      <span><span class="status-dot"></span>LIVE DATA FEED</span>
+      <span id="clock">--:--:-- UTC</span>
+      <span style="display:none" id="hd-fy">FY2025 · Q4 EARNINGS</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-eyebrow">// EXECUTIVE INTELLIGENCE BRIEF // PALANTIR TECHNOLOGIES INC //</div>
+    <div class="hero-name">PALANTIR <span class="hl">AI PLATFORM</span></div>
+    <div class="hero-tagline">INTELLIGENCE OPERATIONS DASHBOARD — FY2025</div>
+    <div class="hero-byline">
+      <span>NYSE: PLTR</span><i></i>
+      <span>AI / DATA INTELLIGENCE</span><i></i>
+      <span>FOUNDED 2003 · DENVER CO</span><i></i>
+      <span>MARKET CAP ~$350B</span>
+    </div>
+  </div>
+
+  <!-- ── 01 KPIs ── -->
+  <div class="sec">
+    <span class="sec-num">// 01</span>
+    <span class="sec-title">KEY PERFORMANCE INDICATORS — FY2025</span>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi c-blue">
+      <div class="kpi-label">FY2025 Revenue</div>
+      <div class="kpi-val" id="k-rev">$0</div>
+      <div class="kpi-sub">Total Annual Revenue</div>
+      <span class="badge badge-green">▲ +56% YoY</span>
+    </div>
+    <div class="kpi c-amber">
+      <div class="kpi-label">FY2026 Guidance</div>
+      <div class="kpi-val" id="k-guide">$0</div>
+      <div class="kpi-sub">Company Guidance</div>
+      <span class="badge badge-amber">+61% projected</span>
+    </div>
+    <div class="kpi c-green">
+      <div class="kpi-label">Gross Margin</div>
+      <div class="kpi-val" id="k-gm">0%</div>
+      <div class="kpi-sub">FY2025</div>
+      <span class="badge badge-green">Best-in-class</span>
+    </div>
+    <div class="kpi c-cyan">
+      <div class="kpi-label">Adj. Op. Margin</div>
+      <div class="kpi-val" id="k-om">0%</div>
+      <div class="kpi-sub">FY2025</div>
+      <span class="badge badge-cyan">Rule of 40: 94</span>
+    </div>
+    <div class="kpi c-white">
+      <div class="kpi-label">Enterprise Customers</div>
+      <div class="kpi-val" id="k-cust">0</div>
+      <div class="kpi-sub">Active FY2025</div>
+      <span class="badge badge-dim">+20% YoY</span>
+    </div>
+  </div>
+
+  <!-- ── 02 REVENUE ── -->
+  <div class="sec">
+    <span class="sec-num">// 02</span>
+    <span class="sec-title">REVENUE TRAJECTORY 2019–2026E</span>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="col2">
+    <div class="card" style="animation-delay:.15s">
+      <div class="card-title">Annual Revenue ($M) with YoY Growth</div>
+      <div class="card-sub">Bar = Revenue · Line = Growth % (right axis)</div>
+      <div style="position:relative;height:270px"><canvas id="revenueChart"></canvas></div>
+    </div>
+    <div class="card" style="animation-delay:.25s">
+      <div class="card-title">FY2025 Revenue Segmentation</div>
+      <div class="card-sub">4 segments by geography &amp; customer type</div>
+      <div style="position:relative;height:270px"><canvas id="donutChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ── 03 US COMMERCIAL ── -->
+  <div class="sec">
+    <span class="sec-num">// 03</span>
+    <span class="sec-title">US COMMERCIAL ACCELERATION — AIP INFLECTION POINT</span>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="card-full" style="animation-delay:.2s">
+    <div class="card-title">US Commercial Revenue ($M) &amp; YoY Growth % — Quarterly 2025</div>
+    <div class="card-sub">AIP bootcamp-driven enterprise adoption → exponential acceleration Q1→Q4</div>
+    <div style="position:relative;height:250px"><canvas id="commChart"></canvas></div>
+  </div>
+
+  <!-- ── 04 STACKED SEGMENTS ── -->
+  <div class="sec">
+    <span class="sec-num">// 04</span>
+    <span class="sec-title">SEGMENT REVENUE HISTORY 2020–2025</span>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="card-full" style="animation-delay:.2s">
+    <div class="card-title">Stacked Revenue by Segment ($M)</div>
+    <div class="card-sub">US Gov · US Commercial · Intl Commercial · Intl Gov</div>
+    <div style="position:relative;height:270px"><canvas id="stackedChart"></canvas></div>
+  </div>
+
+  <!-- ── 05 MARGINS ── -->
+  <div class="sec">
+    <span class="sec-num">// 05</span>
+    <span class="sec-title">MARGIN EXPANSION TIMELINE</span>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="card-full" style="animation-delay:.2s">
+    <div class="card-title">Gross Margin &amp; Adjusted Operating Margin (%)</div>
+    <div class="card-sub">Structural profitability improvement — 2024 through 2026E</div>
+    <div style="position:relative;height:230px"><canvas id="marginChart"></canvas></div>
+  </div>
+
+  <!-- ── 06 COMPETITOR CHARTS ── -->
+  <div class="sec">
+    <span class="sec-num">// 06</span>
+    <span class="sec-title">COMPETITIVE LANDSCAPE — POSITIONING MAP</span>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="col2">
+    <div class="card" style="animation-delay:.15s">
+      <div class="card-title">Growth vs Gross Margin — Bubble Map</div>
+      <div class="card-sub">Bubble size ∝ Market Cap · PLTR occupies premium quadrant</div>
+      <div style="position:relative;height:290px"><canvas id="bubbleChart"></canvas></div>
+    </div>
+    <div class="card" style="animation-delay:.25s">
+      <div class="card-title">Price / Sales Multiple Comparison</div>
+      <div class="card-sub">Valuation premium reflects AI platform leadership</div>
+      <div style="position:relative;height:290px"><canvas id="psChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ── 07 TABLE ── -->
+  <div class="sec">
+    <span class="sec-num">// 07</span>
+    <span class="sec-title">COMPETITOR INTELLIGENCE MATRIX</span>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="card-full" style="animation-delay:.2s; padding:0 0 1px;">
+    <table class="ctable">
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th>Revenue</th>
+          <th>Growth YoY</th>
+          <th>Gross Margin</th>
+          <th>Op. Margin</th>
+          <th>P/S</th>
+          <th>Mkt Cap</th>
+          <th>GAAP+</th>
+        </tr>
+      </thead>
+      <tbody id="ctbody"></tbody>
+    </table>
+  </div>
+
+</div><!-- /wrap -->
+
+<footer>
+  <span>// PALANTIR TECHNOLOGIES INC · FY2025 EARNINGS DATA · EXECUTIVE INTELLIGENCE BRIEF</span>
+  <span>DATA AS OF Q4 2025 · GENERATED <span id="fdate"></span></span>
+</footer>
+
+<script>
+// ── CLOCK ──
+(function tick() {
+  document.getElementById('clock').textContent =
+    new Date().toISOString().replace('T',' ').slice(0,19) + ' UTC';
+  setTimeout(tick, 1000);
+})();
+document.getElementById('fdate').textContent =
+  new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+document.getElementById('hd-fy').style.display = '';
+
+// ── ANIMATED COUNTERS ──
+function count(el, target, pre, suf, dec, ms) {
+  let t0 = null;
+  (function frame(ts) {
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / ms, 1);
+    const e = 1 - Math.pow(1 - p, 3);
+    el.textContent = pre + (target * e).toFixed(dec) + suf;
+    if (p < 1) requestAnimationFrame(frame);
+    else el.textContent = pre + target.toFixed(dec) + suf;
+  })(0);
+  requestAnimationFrame(t => { t0 = null; (function frame(ts){ if(!t0) t0=ts; const p=Math.min((ts-t0)/ms,1); const e=1-Math.pow(1-p,3); el.textContent=pre+(target*e).toFixed(dec)+suf; if(p<1) requestAnimationFrame(frame); else el.textContent=pre+target.toFixed(dec)+suf; })(t); });
+}
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    count(document.getElementById('k-rev'),   4.475, '$', 'B', 3, 1400);
+    count(document.getElementById('k-guide'), 7.209, '$', 'B', 3, 1700);
+    count(document.getElementById('k-gm'),    80,    '',  '%', 0, 1100);
+    count(document.getElementById('k-om'),    38,    '',  '%', 0, 1100);
+    count(document.getElementById('k-cust'),  711,   '',  '',  0, 1500);
+  }, 350);
+});
+
+// ── CHART DEFAULTS ──
+Chart.defaults.color = '#4A6080';
+Chart.defaults.font.family = "'IBM Plex Mono', monospace";
+Chart.defaults.font.size = 11;
+
+const C = {
+  blue:  '#00A8FF', cyan: '#00D4FF', amber: '#FF8C00',
+  green: '#39FF14', red:  '#FF2E4C', muted: '#1E2D40',
+  soft:  '#6688AA',
+  grid:  'rgba(0,168,255,0.05)',
+  tip:   { backgroundColor:'#0c1220', borderColor:'rgba(0,168,255,0.3)', borderWidth:1 },
+};
+
+// 1 ── REVENUE BAR + LINE
+(() => {
+  const ctx = document.getElementById('revenueChart').getContext('2d');
+  new Chart(ctx, {
+    data: {
+      labels: ['2019','2020','2021','2022','2023','2024','2025','2026E'],
+      datasets: [
+        {
+          type: 'bar', label: 'Revenue ($M)',
+          data: [743, 1092, 1542, 1906, 2229, 2870, 4475, 7209],
+          backgroundColor: ctx2 => ctx2.dataIndex === 7 ? 'rgba(255,140,0,0.28)' : 'rgba(0,168,255,0.2)',
+          borderColor:     ctx2 => ctx2.dataIndex === 7 ? C.amber : C.blue,
+          borderWidth: 1, yAxisID: 'y',
+        },
+        {
+          type: 'line', label: 'YoY Growth %',
+          data: [null, 47, 41, 24, 17, 29, 56, 61],
+          borderColor: C.green, borderWidth: 2,
+          pointBackgroundColor: C.green, pointRadius: 4,
+          tension: 0.38, fill: false, yAxisID: 'y2',
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode:'index', intersect:false },
+      plugins: { legend:{ display:false }, tooltip: C.tip },
+      scales: {
+        x:  { grid:{ color:C.grid }, ticks:{ color:'#4A6080' } },
+        y:  { grid:{ color:C.grid }, ticks:{ color:'#4A6080', callback: v => '$'+v } },
+        y2: { position:'right', grid:{ display:false },
+              ticks:{ color:C.green, callback: v => v+'%' } }
+      }
+    }
+  });
+})();
+
+// 2 ── DONUT
+(() => {
+  const ctx = document.getElementById('donutChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['US Government','US Commercial','Intl Commercial','Intl Government'],
+      datasets: [{
+        data: [1372, 1466, 767, 470],
+        backgroundColor: ['rgba(0,168,255,0.65)','rgba(255,140,0,0.65)','rgba(0,212,255,0.65)','rgba(57,255,20,0.45)'],
+        borderColor:     [C.blue, C.amber, C.cyan, C.green],
+        borderWidth: 1.5, hoverOffset: 10,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '62%',
+      plugins: {
+        legend: { position:'right', labels:{ color:'#7A9BC2', font:{size:11}, padding:14, usePointStyle:true, pointStyleWidth:10 } },
+        tooltip: { ...C.tip, callbacks: { label: c => ` ${c.label}: $${c.parsed}M (${(c.parsed/4475*100).toFixed(1)}%)` } }
+      }
+    }
+  });
+})();
+
+// 3 ── US COMMERCIAL QUARTERLY
+(() => {
+  const ctx = document.getElementById('commChart').getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, 0, 250);
+  grad.addColorStop(0, 'rgba(57,255,20,0.2)');
+  grad.addColorStop(1, 'rgba(57,255,20,0.01)');
+  new Chart(ctx, {
+    data: {
+      labels: ['Q1 2025','Q2 2025','Q3 2025','Q4 2025'],
+      datasets: [
+        {
+          type: 'bar', label: 'US Comm Revenue ($M)',
+          data: [255, 334, 370, 507],
+          backgroundColor: 'rgba(255,140,0,0.22)', borderColor: C.amber, borderWidth: 1, yAxisID: 'y',
+        },
+        {
+          type: 'line', label: 'YoY Growth %',
+          data: [71, 93, 121, 137],
+          borderColor: C.green, backgroundColor: grad, fill: true,
+          borderWidth: 2.5, pointRadius: 7, pointBackgroundColor: C.green,
+          tension: 0.35, yAxisID: 'y2',
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode:'index', intersect:false },
+      plugins: { legend:{ display:false }, tooltip: C.tip },
+      scales: {
+        x:  { grid:{ color:C.grid }, ticks:{ color:'#4A6080' } },
+        y:  { grid:{ color:C.grid }, ticks:{ color:'#4A6080', callback: v => '$'+v+'M' } },
+        y2: { position:'right', grid:{ display:false },
+              min:0, max:180, ticks:{ color:C.green, callback: v => v+'%' } }
+      }
+    }
+  });
+})();
+
+// 4 ── STACKED SEGMENTS
+(() => {
+  const ctx = document.getElementById('stackedChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['2020','2021','2022','2023','2024','2025'],
+      datasets: [
+        { label:'US Government',   data:[610,897,1073,1220,1317,1372], backgroundColor:'rgba(0,168,255,0.65)',  borderColor:C.blue,  borderWidth:0.5, stack:'s' },
+        { label:'US Commercial',   data:[92,254,293,394,702,1466],     backgroundColor:'rgba(255,140,0,0.65)', borderColor:C.amber, borderWidth:0.5, stack:'s' },
+        { label:'Intl Commercial', data:[143,144,147,225,466,767],     backgroundColor:'rgba(0,212,255,0.55)', borderColor:C.cyan,  borderWidth:0.5, stack:'s' },
+        { label:'Intl Government', data:[247,247,393,390,385,470],     backgroundColor:'rgba(57,255,20,0.38)', borderColor:C.green, borderWidth:0.5, stack:'s' },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode:'index', intersect:false },
+      plugins: {
+        legend: { position:'top', labels:{ color:'#7A9BC2', font:{size:11}, usePointStyle:true, pointStyleWidth:10 } },
+        tooltip: C.tip,
+      },
+      scales: {
+        x: { stacked:true, grid:{ color:C.grid }, ticks:{ color:'#4A6080' } },
+        y: { stacked:true, grid:{ color:C.grid }, ticks:{ color:'#4A6080', callback: v => '$'+v+'M' } }
+      }
+    }
+  });
+})();
+
+// 5 ── MARGINS
+(() => {
+  const ctx = document.getElementById('marginChart').getContext('2d');
+  const gA = ctx.createLinearGradient(0,0,0,230);
+  gA.addColorStop(0,'rgba(0,168,255,0.12)'); gA.addColorStop(1,'rgba(0,168,255,0)');
+  const gB = ctx.createLinearGradient(0,0,0,230);
+  gB.addColorStop(0,'rgba(255,140,0,0.12)'); gB.addColorStop(1,'rgba(255,140,0,0)');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['2024','2025 Q1','2025 Q2','2025 Q3','2025 Q4','FY2025','2026E'],
+      datasets: [
+        { label:'Gross Margin %',         data:[76,79.8,80,80,80,80,80],       borderColor:C.blue,  backgroundColor:gA, fill:true, tension:0.35, borderWidth:2, pointRadius:5, pointBackgroundColor:C.blue },
+        { label:'Adj. Operating Margin %', data:[29,35,38,38.6,38.4,38,39],    borderColor:C.amber, backgroundColor:gB, fill:true, tension:0.35, borderWidth:2, pointRadius:5, pointBackgroundColor:C.amber },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode:'index', intersect:false },
+      plugins: {
+        legend: { position:'top', labels:{ color:'#7A9BC2', font:{size:11}, usePointStyle:true } },
+        tooltip: C.tip,
+      },
+      scales: {
+        x: { grid:{ color:C.grid }, ticks:{ color:'#4A6080' } },
+        y: { min:20, max:90, grid:{ color:C.grid }, ticks:{ color:'#4A6080', callback: v => v+'%' } }
+      }
+    }
+  });
+})();
+
+// 6 ── BUBBLE
+(() => {
+  const ctx = document.getElementById('bubbleChart').getContext('2d');
+  const peers = [
+    { t:'PLTR',  x:56, y:80, r:22, c:C.amber },
+    { t:'SNOW',  x:29, y:67, r: 9, c:C.blue  },
+    { t:'DBRK',  x:50, y:70, r:11, c:C.cyan  },
+    { t:'NOW',   x:20, y:79, r:17, c:C.green },
+    { t:'VEEV',  x:16, y:75, r: 7, c:'#AA88FF' },
+    { t:'C3AI',  x:25, y:55, r: 3, c:C.soft  },
+  ];
+  new Chart(ctx, {
+    type: 'bubble',
+    data: { datasets: peers.map(p => ({
+      label: p.t,
+      data: [{ x:p.x, y:p.y, r:p.r }],
+      backgroundColor: p.c + '33', borderColor: p.c, borderWidth: 1.5,
+    })) },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position:'right', labels:{ color:'#7A9BC2', font:{size:10}, usePointStyle:true } },
+        tooltip: { ...C.tip, callbacks: { label: c => ` Growth: ${c.raw.x}%  GM: ${c.raw.y}%` } }
+      },
+      scales: {
+        x: { title:{ display:true, text:'Revenue Growth % YoY', color:'#4A6080', font:{size:10} },
+             grid:{ color:C.grid }, ticks:{ color:'#4A6080', callback: v => v+'%' } },
+        y: { min:40, max:90,
+             title:{ display:true, text:'Gross Margin %', color:'#4A6080', font:{size:10} },
+             grid:{ color:C.grid }, ticks:{ color:'#4A6080', callback: v => v+'%' } }
+      }
+    }
+  });
+})();
+
+// 7 ── P/S BAR
+(() => {
+  const ctx = document.getElementById('psChart').getContext('2d');
+  const rows = [
+    ['PLTR',78],['SNOW',17],['DBRK',27],['NOW',19],['VEEV',15],['C3AI',9],['IBM',2.7]
+  ];
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: rows.map(r => r[0]),
+      datasets: [{
+        data: rows.map(r => r[1]),
+        backgroundColor: rows.map(r => r[0]==='PLTR' ? 'rgba(255,140,0,0.45)' : 'rgba(0,168,255,0.18)'),
+        borderColor:     rows.map(r => r[0]==='PLTR' ? C.amber : C.blue),
+        borderWidth: 1,
+      }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display:false },
+        tooltip: { ...C.tip, callbacks: { label: c => ` P/S: ${c.raw}x` } }
+      },
+      scales: {
+        x: { grid:{ color:C.grid }, ticks:{ color:'#4A6080', callback: v => v+'x' } },
+        y: { grid:{ display:false }, ticks:{ color: ctx2 => ctx2.label==='PLTR' ? C.amber : '#4A6080' } }
+      }
+    }
+  });
+})();
+
+// 8 ── COMPETITOR TABLE
+(() => {
+  const rows = [
+    { co:'Palantir (PLTR)', rev:4475,  g:56, gm:80, om:38,  ps:78,   mc:350, p:'yes', pltr:true },
+    { co:'Snowflake (SNOW)', rev:3840, g:29, gm:67, om:-27, ps:17,   mc:67,  p:'no'  },
+    { co:'Databricks',       rev:3700, g:50, gm:70, om:-5,  ps:27,   mc:100, p:'near'},
+    { co:'ServiceNow (NOW)', rev:11500,g:20, gm:79, om:25,  ps:19,   mc:220, p:'yes' },
+    { co:'Veeva (VEEV)',     rev:2700, g:16, gm:75, om:32,  ps:15,   mc:40,  p:'yes' },
+    { co:'C3.ai (AI)',       rev:389,  g:25, gm:55, om:-30, ps:9,    mc:3.5, p:'no'  },
+    { co:'IBM (IBM)',        rev:74800,g:2,  gm:55, om:15,  ps:2.7,  mc:200, p:'yes' },
+    { co:'Anduril (priv.)',  rev:1000, g:100,gm:null,om:null,ps:28,  mc:28,  p:'no'  },
+  ];
+  const maxRev = Math.max(...rows.map(r => r.rev));
+  const tbody  = document.getElementById('ctbody');
+
+  rows.forEach(d => {
+    const tr = document.createElement('tr');
+    if (d.pltr) tr.className = 'pltr-row';
+
+    const gcol = d.g > 40 ? C.green : d.g > 20 ? C.blue : '#4A6080';
+    const omcol = d.om == null ? '#4A6080' : d.om > 0 ? C.green : C.red;
+    const omtxt = d.om == null ? '—' : (d.om > 0 ? '+' : '') + d.om + '%';
+    const gmtxt = d.gm == null ? '—' : d.gm + '%';
+    const pIcon = { yes:`<span class="yes">● GAAP+</span>`, no:`<span class="no">○ —</span>`, near:`<span class="near">◐ ~</span>` };
+
+    tr.innerHTML = `
+      <td>${d.co}${d.pltr ? '<span class="tag-target">TARGET</span>' : ''}</td>
+      <td><div class="bar-wrap">
+        <div class="bar-track"><div class="bar-fill" style="width:${(d.rev/maxRev*100).toFixed(0)}%"></div></div>
+        $${d.rev >= 1000 ? (d.rev/1000).toFixed(1)+'B' : d.rev+'M'}
+      </div></td>
+      <td style="color:${gcol}">+${d.g}%</td>
+      <td style="color:${d.gm && d.gm>=75 ? C.blue : '#7A9BC2'}">${gmtxt}</td>
+      <td style="color:${omcol}">${omtxt}</td>
+      <td>${d.ps}x</td>
+      <td>$${d.mc}B</td>
+      <td>${pIcon[d.p]}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+})();
+</script>
+</body>
+</html>

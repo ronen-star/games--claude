@@ -1,0 +1,133 @@
+{
+  "report_title": "Palantir Technologies Inc. (PLTR) — KPI Tracker Report",
+  "generated": "2026-03-28",
+  "data_as_of": "FY2025 / Q4 2025",
+  "total_kpis": 8,
+  "green": 5,
+  "yellow": 2,
+  "red": 1,
+  "health_score": 62.5,
+  "summary": "Palantir בריאות תפעולית טובה מאוד — צמיחה מואצת ב-AIP מניעה תוצאות מעבר ליעדים. הערכת שווי גבוהה (P/S 78x) מהווה סיכון מרכזי.",
+  "kpis": [
+    {
+      "name": "Annual Revenue",
+      "actual": 4475,
+      "unit": "USD_millions",
+      "target": 5000,
+      "variance": -525,
+      "variance_pct": -10.5,
+      "status": "YELLOW",
+      "label": "[!!]",
+      "trend": "UP",
+      "note": "FY2025 $4.475B (+56% YoY). מתחת ליעד $5B אבל מעל הדרכה. FY2026 מכוון $7.2B."
+    },
+    {
+      "name": "US Commercial Revenue Growth",
+      "actual": 137,
+      "unit": "percent_yoy",
+      "target": 100,
+      "variance": 37,
+      "variance_pct": 37.0,
+      "status": "GREEN",
+      "label": "[OK]",
+      "trend": "UP",
+      "note": "Q4 2025: +137% YoY — שיא של כל הזמנים. AIP bootcamps מניעים גיוס לקוחות מהיר."
+    },
+    {
+      "name": "US Government Revenue",
+      "actual": 1320,
+      "unit": "USD_millions",
+      "target": 1200,
+      "variance": 120,
+      "variance_pct": 10.0,
+      "status": "GREEN",
+      "label": "[OK]",
+      "trend": "UP",
+      "note": "FY2025: $1.32B (+66% YoY). הסכמי DoD מרחיבים; מדיניות DOGE עלולה להשפיע ב-2026."
+    },
+    {
+      "name": "Net Income Margin",
+      "actual": 13.6,
+      "unit": "percent",
+      "target": 15.0,
+      "variance": -1.4,
+      "variance_pct": -9.3,
+      "status": "YELLOW",
+      "label": "[!!]",
+      "trend": "UP",
+      "note": "FY2025: 13.6% שולי נקי. מתחת ליעד 15% — SBC עדיין גבוה (GAAP). Non-GAAP אחר לגמרי."
+    },
+    {
+      "name": "Adjusted Operating Margin",
+      "actual": 38.0,
+      "unit": "percent",
+      "target": 40.0,
+      "variance": -2.0,
+      "variance_pct": -5.0,
+      "status": "GREEN",
+      "label": "[OK]",
+      "trend": "UP",
+      "note": "FY2025 adjusted op margin: ~38%. בדרך ל-40%+ ב-2026. Rule of 40 = 94 — best in class."
+    },
+    {
+      "name": "Total Contract Value (TCV)",
+      "actual": 2760,
+      "unit": "USD_millions",
+      "target": 800,
+      "variance": 1960,
+      "variance_pct": 245.0,
+      "status": "GREEN",
+      "label": "[OK]",
+      "trend": "UP",
+      "note": "TTM TCV: $2.76B (+151% YoY). US Comm TCV: $1.31B (+342%). Revenue backlog חזק מאוד."
+    },
+    {
+      "name": "Customer Count",
+      "actual": 711,
+      "unit": "count",
+      "target": 600,
+      "variance": 111,
+      "variance_pct": 18.5,
+      "status": "GREEN",
+      "label": "[OK]",
+      "trend": "UP",
+      "note": "Q4 2025: 711 לקוחות. AIP bootcamps מאיצים גיוס מסחרי — מודל GTM חדשני."
+    },
+    {
+      "name": "Price-to-Sales Ratio",
+      "actual": 78,
+      "unit": "multiple",
+      "target": 50,
+      "variance": 28,
+      "variance_pct": 56.0,
+      "status": "RED",
+      "label": "[XX]",
+      "higher_is_better": false,
+      "trend": "HIGH",
+      "note": "P/S ~78x — Premium קיצוני. מניח צמיחה מושלמת לשנים רבות. Snowflake: 17x, IBM: 2.7x."
+    }
+  ],
+  "strategic_insights": {
+    "strengths": [
+      "AIP Platform — הפלטפורמה הראשונה לאינטגרציה של LLMs בתוך ארגון מאובטח",
+      "מודל GTM חדשני — AIP Bootcamps ממירים לידים תוך ימים בודדים",
+      "Rule of 40 = 94 — הטוב ביותר בקטגוריה",
+      "60%+ הכנסות ממגזר ממשלתי — ברייה יציבה ולא מחזורית",
+      "Cash flow חיובי עם $4.5B cash ב-balance sheet"
+    ],
+    "risks": [
+      "הערכת שווי P/S 78x — כל ביאוש בצמיחה יגרור תיקון חד",
+      "תלות בחוזי ממשל ארה\"ב — חשיפה לשינויי מדיניות (DOGE, תקציב)",
+      "תחרות גוברת מ-Microsoft Azure OpenAI ו-Databricks",
+      "Stock-Based Compensation גבוה פוגע ב-GAAP profitability",
+      "פיזור גאוגרפי מוגבל — 65%+ מהכנסות מארה\"ב"
+    ],
+    "opportunities": [
+      "שוק ה-AI Enterprise מוערך ב-$1T+ עד 2030",
+      "הרחבה בינלאומית — אירופה ומדינות בריתות NATO",
+      "AI בבריאות (AIP for Healthcare) — שוק $100B+",
+      "שותפויות OEM עם ענקי IT (Oracle, AWS)",
+      "Maven Smart System — פלטפורמת AI ביטחונית הדור הבא"
+    ]
+  }
+}
