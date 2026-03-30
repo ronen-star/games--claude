@@ -1,5 +1,11 @@
 {
   "enabledPlugins": {
     "frontend-design@claude-plugins-official": true
+  },
+  "permissions": {
+    "allow": [
+      "Bash(rm \"c:/Users/ronen/games- claude/.vscode/settings.json\")",
+      "Bash(rmdir \"c:/Users/ronen/games- claude/.vscode\")"
+    ]
   }
 }
