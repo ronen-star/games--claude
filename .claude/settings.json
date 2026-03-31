@@ -1,11 +1,21 @@
 {
-  "enabledPlugins": {
-    "frontend-design@claude-plugins-official": true
-  },
   "permissions": {
     "allow": [
       "Bash(rm \"c:/Users/ronen/games- claude/.vscode/settings.json\")",
-      "Bash(rmdir \"c:/Users/ronen/games- claude/.vscode\")"
+      "Bash(rmdir \"c:/Users/ronen/games- claude/.vscode\")",
+      "Read(//c/Users/ronen/**)",
+      "Bash(code \"C:/Users/ronen/recipe-book\")",
+      "Bash(start \"\" \"C:/Users/ronen/recipe-book\")",
+      "Bash(where code.cmd)",
+      "Bash(where code:*)",
+      "Bash(cmd /c \"C:/Users/ronen/AppData/Local/Programs/Microsoft VS Code/bin/code.cmd\" \"C:/Users/ronen/recipe-book\")",
+      "Bash(powershell -Command \"& ''C:/Users/ronen/AppData/Local/Programs/Microsoft VS Code/bin/code.cmd'' ''C:/Users/ronen/recipe-book''\")"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\ronen\\.claude\\projects\\C--Users-ronen-OneDrive--------Ronen--workspace--obsidian"
     ]
+  },
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true
   }
 }
